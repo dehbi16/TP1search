@@ -14,10 +14,10 @@ public class Environnement {
 	
 	public void run() {
 		// on peut remplacer le compteur par des probabilités d'apparition 
-		if (count == 5) {
+		if (count == 10) {
 			int a= (int)(Math.random()*5+1) - 1;
 			int b = (int)(Math.random()*5+1) - 1;
-			L[a][b] = 1;
+			if (L[a][b]!=2) L[a][b] = 1;
 		}
 		else count++;
 	}

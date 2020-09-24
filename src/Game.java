@@ -6,6 +6,8 @@ public class Game {
 	protected Environnement env;
 	public Game() throws InterruptedException {
 		init();
+		
+		
 		isRunning = true;
 		while(isRunning) {
 			TimeUnit.SECONDS.sleep(1);
@@ -26,10 +28,10 @@ public class Game {
 		a = (int)(Math.random()*5+1) - 1;
 		b = (int)(Math.random()*5+1) - 1;
 		
-		if (env.L[a][b] == 1) env.L[a][b] = 5;
-		else env.L[a][b] = 4;
+		env.L[a][b] = 2;
 		agent = new Agent(b, a, this);
-
+		
+		
 	}
 	
 	

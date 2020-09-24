@@ -5,19 +5,18 @@ public class Main {
 	static List <Integer> solution= new ArrayList<Integer>();
 	static int nbsolution;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		// TODO Auto-generated method stub
-		int n=10;
-		
-			
-		breathFirst(n);
+		//int n=10;
+		new Game();
+		//breathFirst(n);
 		//backTracking(10, 0);
-		System.out.println(nbsolution);
+		//System.out.println(nbsolution);
 	}
 	
 	public static void breathFirst(int n) {
 		nbsolution=0;
-		List <List> L = new ArrayList<List>();
+		List <List<Integer>> L = new ArrayList<List<Integer>>();
 		List <Integer> a;
 		ArrayList<Integer> position;
 		for (int i=0; i<n; i++) {
