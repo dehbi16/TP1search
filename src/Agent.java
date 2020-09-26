@@ -102,7 +102,7 @@ public class Agent {
 				newl = resultat[0];
 				newc = resultat[1];
 			}
-			if (g.env.L[newl][newc] == 1) {
+			if (g.env.L[newl][newc] == State.dust) {
 				return i;
 			}
 		}
@@ -111,7 +111,7 @@ public class Agent {
 	
 	private void move(int index) {
 		// extraire la solution de la liste et appliquer les mouvements pour faire bouger l'agent.
-		g.env.L[this.y][this.x] = 0;
+		g.env.L[this.y][this.x] = State.empty;
 		int newl = this.y;
 		int newc = this.x;
 		int [] resultat;
@@ -122,13 +122,13 @@ public class Agent {
 		}
 		this.y = newl;
 		this.x = newc;
-		g.env.L[this.y][this.x] = 2;
+		g.env.L[this.y][this.x] = State.robot;
 	}
 
 	private boolean isclean() {
 		for(int i=0; i<5; i++) {
 			for(int j=0; j<5; j++) {
-				if (g.env.L[i][j] == 1 || g.env.L[i][j] == 5) return false;
+				if (g.env.L[i][j] == State.dust ) return false;
 			}
 		}
 		return true;

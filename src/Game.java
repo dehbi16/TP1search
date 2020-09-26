@@ -23,12 +23,12 @@ public class Game {
 		for (int i=0; i<7; i++) {
 			a = (int)(Math.random()*5+1) - 1;
 			b = (int)(Math.random()*5+1) - 1;
-			env.L[a][b] = 1;
+			env.L[a][b] = State.dust;
 		}
 		a = (int)(Math.random()*5+1) - 1;
 		b = (int)(Math.random()*5+1) - 1;
 		
-		env.L[a][b] = 2;
+		env.L[a][b] = State.robot;
 		agent = new Agent(b, a, this);
 		
 		
