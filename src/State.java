@@ -2,7 +2,9 @@
 public enum State {
 	empty("0"),
 	dust("1"),
-	robot("2");
+	jewelry("2"),
+	dustjewelry("3"),
+	robot("4");
 
 	private String name = "";
 
