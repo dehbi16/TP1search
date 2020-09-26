@@ -10,7 +10,18 @@ public class Game {
 		
 		isRunning = true;
 		while(isRunning) {
-			TimeUnit.SECONDS.sleep(1);
+			TimeUnit.MILLISECONDS.sleep(300);
+			for(int i=0; i<5; i++) {
+				for (int j=0; j<5; j++) {
+					System.out.print(env.L[i][j].tosString()+" ");
+				}
+				System.out.println();
+			}
+			System.out.println("nombre aspirer = "+agent.nbaspirer);
+			System.out.println("nombre bijoux = "+agent.nbbijoux);
+			System.out.println("nombre de coût = "+agent.cout);
+			System.out.println("nombre d'erreur = "+agent.erreur);
+			System.out.println();
 			env.run();
 			agent.run();
 		}
