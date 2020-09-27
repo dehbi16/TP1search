@@ -5,57 +5,55 @@ public class Agent {
 	protected int x;
 	protected int y;
 	protected Game g;
+	private State[][] L;
 	protected static List <List<Direction>> solution;
-	
+	protected int nbaspirer = 0;
+	protected int nbbijoux = 0;
+	protected int cout = 0;
+	protected int erreur = 0;
+
 	public Agent(int x, int y, Game g) {
 		this.x = x;
 		this.y = y;
 		this.g = g;
 		init();		
 	}
-	
+
 	protected void run() {
-		if (isclean()) {
-			g.isRunning = false;
+		int index = goal();
+		if(index>=0) {
+			System.out.print("solution: ");
+			for(int i=0; i<solution.get(index).size(); i++) {
+				System.out.print(solution.get(index).get(i)+" ");
+			}
+			System.out.println();
+			move(index);
+			init();
+			if (isclean()) {
+				g.isRunning = false;
+			}
 		}
 		else {
-			int index = goal();
-			if(index>=0) {
-				System.out.print("solution: ");
-				for(int i=0; i<solution.get(index).size(); i++) {
-					System.out.print(solution.get(index).get(i)+" ");
+			List <Direction> a;
+			List <Direction> position;
+			int size = solution.size();
+
+			for (int i=0; i<size; i++) {
+				a = solution.get(0);
+				solution.remove(0);
+				position = positions(a);
+				for (int j=0; j<position.size(); j++) {
+					List <Direction> b = new ArrayList<Direction>();
+					b.addAll(a);
+					b.add(position.get(j));
+					solution.add(b);
 				}
-				System.out.println("\n");
-				move(index);
-				init();
 			}
-			else {
-				List <Direction> a;
-				List <Direction> position;
-				int size = solution.size();
-				
-				for (int i=0; i<size; i++) {
-					a = solution.get(0);
-					solution.remove(0);
-					position = positions(a);
-					for (int j=0; j<position.size(); j++) {
-						List <Direction> b = new ArrayList<Direction>();
-						b.addAll(a);
-						b.add(position.get(j));
-						solution.add(b);
-					}
-				}
-				for(int i=0; i<solution.size(); i++) {
-					for (int k=0; k<solution.get(i).size(); k++) {
-						System.out.print(solution.get(i).get(k)+" ");
-					}
-					System.out.println();
-				}
-				System.out.println();
-			}
+
 		}
+
 	}
-	
+
 	private List<Direction> positions(List<Direction> a) {
 		// créer des nouveaux noeuds pour chaque état
 		int newl = this.y;
@@ -74,7 +72,7 @@ public class Agent {
 		if (newc!=0 && a.get(i) != Direction.droite) directionPossible.add(Direction.gauche);
 		if (newc!=4 && a.get(i) != Direction.gauche) directionPossible.add(Direction.droite);
 
-		
+
 		return directionPossible;
 	}
 
@@ -88,7 +86,7 @@ public class Agent {
 		resultat[1] = newc;
 		return resultat;
 	}
-	
+
 	private int goal() {
 		// le but est de trouver une poussière
 		int [] resultat;
@@ -102,13 +100,13 @@ public class Agent {
 				newl = resultat[0];
 				newc = resultat[1];
 			}
-			if (g.env.L[newl][newc] == State.dust) {
+			if (this.L[newl][newc] == State.dust || this.L[newl][newc] == State.jewelry || this.L[newl][newc] == State.dustjewelry ) {
 				return i;
 			}
 		}
 		return -1;
 	}
-	
+
 	private void move(int index) {
 		// extraire la solution de la liste et appliquer les mouvements pour faire bouger l'agent.
 		g.env.L[this.y][this.x] = State.empty;
@@ -119,28 +117,40 @@ public class Agent {
 			resultat = calculeP(solution.get(index).get(i), newl, newc);
 			newl = resultat[0];
 			newc = resultat[1];
+			cout++;
 		}
 		this.y = newl;
 		this.x = newc;
+		if (this.L[this.y][this.x] == State.dust) {
+			nbaspirer++;
+			cout++;
+			if (g.env.L[this.y][this.x] != State.dust) erreur++;
+			g.env.L[this.y][this.x] = State.robot;
+		}
+		else if (this.L[this.y][this.x] == State.jewelry) {
+			nbbijoux++;
+			cout++;
+		}
+		else if (this.L[this.y][this.x] == State.dustjewelry) {
+			nbbijoux++;
+			nbaspirer++;
+			cout+=2;
+		}
 		g.env.L[this.y][this.x] = State.robot;
 	}
 
 	private boolean isclean() {
 		for(int i=0; i<5; i++) {
 			for(int j=0; j<5; j++) {
-				if (g.env.L[i][j] == State.dust ) return false;
+				if (this.L[i][j] == State.dust || this.L[i][j] == State.jewelry || this.L[i][j] == State.dustjewelry) return false;
 			}
 		}
 		return true;
 	}
-	
+
 	private void init(){
-		for(int i=0; i<5; i++) {
-			for (int j=0; j<5; j++) {
-				System.out.print(g.env.L[i][j]+" ");
-			}
-			System.out.println();
-		}
+		this.L = g.env.L;
+		
 		solution = new ArrayList<List<Direction>>();
 		List <Direction> a;
 		if (this.x != 0) {
@@ -163,15 +173,9 @@ public class Agent {
 			a.add(Direction.bas);
 			solution.add(a);
 		}
-		for(int i=0; i<solution.size(); i++) {
-			for (int k=0; k<solution.get(i).size(); k++) {
-				System.out.print(solution.get(i).get(k)+" ");
-			}
-			System.out.println();
-		}
-		System.out.println();
+
 	}
 
-	
-	
+
+
 }
