@@ -4,6 +4,7 @@ public class Game {
 	protected boolean isRunning = false;
 	protected Agent agent;
 	protected Environnement env;
+	public Manoir manoir;
 	public Game() throws InterruptedException {
 		init();
 		
@@ -14,6 +15,7 @@ public class Game {
 			for(int i=0; i<5; i++) {
 				for (int j=0; j<5; j++) {
 					System.out.print(env.L[i][j].tosString()+" ");
+					manoir.placementD_J_DJ_R(i, j,env.L[i][j].tosString() );
 				}
 				System.out.println();
 			}
@@ -28,6 +30,7 @@ public class Game {
 	}
 	
 	public void init() {
+		manoir= new Manoir();
 		env = new Environnement();
 		int a;
 		int b;
@@ -41,9 +44,28 @@ public class Game {
 		
 		env.L[a][b] = State.robot;
 		agent = new Agent(b, a, this);
+		manoir.placementD_J_DJ_R(a, b, "4");
 		
 		
+	}
+	public String etatCase(String text) {
+		String monEtat="";
+		
+		
+		
+		return monEtat;
 	}
 	
 	
 }
+
+
+
+
+
+ 
+ 
+ 
+
+
+
