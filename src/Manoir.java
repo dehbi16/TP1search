@@ -76,6 +76,11 @@ public class Manoir extends JFrame
 			img=ROBOT;
 		return img;
 	}
+	
+	public void miseAjourSurLeManoirInfoAgent(String nbAspiration,String nbBijouxAspires,String cout,String erreur) {
+		setTitle("MANOIR"+" | AGENT { Aspiration : "+nbAspiration +" Bijoux : "+nbBijouxAspires 
+				+" Cout: "+cout +" Erreur : "+erreur+ " }"); 
+	}
       
   
 } 

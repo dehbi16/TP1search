@@ -56,6 +56,10 @@ public class Game {
 			for (int j=0; j<5; j++) {
 				//System.out.print(env.L[i][j].tosString()+" ");
 				manoir.placementD_J_DJ_R(i, j,env.L[i][j].tosString() );
+				manoir.miseAjourSurLeManoirInfoAgent(String.valueOf(agent.nbaspirer), 
+						String.valueOf(agent.nbbijoux),
+						String.valueOf(agent.cout),
+						String.valueOf(agent.erreur));
 			}
 			//System.out.println();
 		}
