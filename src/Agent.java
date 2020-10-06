@@ -56,6 +56,7 @@ public class Agent {
 			System.out.println();
 			 */
 			//move(index);
+			System.out.println(solutionCoord);
 			moveAetoile(solutionCoord);
 			init();
 			if (isclean()) {
@@ -75,6 +76,9 @@ public class Agent {
 		 * solution.add(b); } } }
 		 */
 		else {
+			//on commence par savoir où il y a de la poussiere
+			coordPoussiere = new ArrayList<Integer>();
+			coordPoussiere = trouverPoussiere();
 			solution();
 		}
 	}
@@ -82,9 +86,15 @@ public class Agent {
 	private void solution() {
 		int ligneInitialeAgent = this.y;
 		int colonneInitialeAgent = this.x;
+		Cl = new ArrayList<List<Integer>>();
+		solutionCoord = new ArrayList<List<Integer>>();
+		coordAgent = new ArrayList<Integer>(); //On remplit la liste Cl avec le point de depart et on l ajoute aussi a la liste des solutions
+		coordAgent.add(ligneInitialeAgent);
+		coordAgent.add(colonneInitialeAgent);
+		Cl.add(coordAgent);
+		solutionCoord.add(coordAgent);
 
 		frontiere = new ArrayList<List<List<Integer>>>();
-		solutionCoord = new ArrayList<List<Integer>>();
 		newNoeud = new ArrayList<List<List<Integer>>>();
 		b = new ArrayList<List<Integer>>(); //permet de créer la liste newNoeud ;
 		for(int i=0;i<solution.size();i++) { //initialisation et expansion du noeud de depart a partir de l init ; on a une frontiere avec plusieurs nouveaux noeuds 
@@ -171,30 +181,22 @@ public class Agent {
 					frontiere.add(a);
 				}
 			}
-			newNoeud.add(b);
-			coordAgent = new ArrayList<Integer>(); //On remplit la liste Cl avec le point de depart et on l ajoute aussi a la liste des solutions
-			Cl = new ArrayList<List<Integer>>();
-
-
-
-			coordAgent.add(ligneInitialeAgent);
-			coordAgent.add(colonneInitialeAgent);
-			Cl.add(coordAgent);
-			solutionCoord.add(coordAgent);
 
 		}
+		newNoeud.add(b);
 		newCoord = new ArrayList<Integer>();
 		newCoord = calculFonctionEvaluation(frontiere); // on a la valeur des coord du noeud qu on va dvlp
 		nbrNoeudExp++;
 		// fin initialisation, la suite permet de det tout le chemin
 		while(indexBis==-1) {
-			indexBis=expansionNoeud(frontiere, newNoeud, Cl, solutionCoord, newCoord, nbrNoeudExp);
+			System.out.println(solutionCoord);
+			indexBis=expansionNoeud(frontiere, newNoeud, Cl, solutionCoord, nbrNoeudExp);
 		}
 	}
 
-	private int expansionNoeud(List <List<List<Integer>>> frontiere,List <List<List<Integer>>> newNoeud, List <List<Integer>> Cl, List <List<Integer>> solutionCoord, List<Integer> newCoord, int nbNoeudExp ) {
+	private int expansionNoeud(List <List<List<Integer>>> frontiere,List <List<List<Integer>>> newNoeud, List <List<Integer>> Cl, List <List<Integer>> solutionCoord, int nbNoeudExp ) {
 		Cl.add(newCoord); // on ajoute a la closed list les nouvelles coord
-		solutionCoord.add(newCoord); // on ajoute a la liste des solutions les nouvelles coord
+
 		List<Direction> d;
 		List<Direction> position;
 		d = new ArrayList<Direction>();
@@ -204,17 +206,22 @@ public class Agent {
 		int deplacementColonne;
 		deplacementLigne = newCoord.get(0)-solutionCoord.get(solutionCoord.size()-1).get(0); // Cl surement a remplacer par la liste des solutions
 		deplacementColonne = newCoord.get(1)-solutionCoord.get(solutionCoord.size()-1).get(1);
+		solutionCoord.add(newCoord); // on ajoute a la liste des solutions les nouvelles coord
 		if(deplacementLigne==0) {
 			if(deplacementColonne==1) {
 				d.add(Direction.droite);
 			}
-			d.add(Direction.gauche);
+			else{
+				d.add(Direction.gauche);
+			}
 		}
 		if(deplacementColonne==0) {
 			if(deplacementLigne==1) {
 				d.add(Direction.bas);
 			}
-			d.add(Direction.haut);
+			else{
+				d.add(Direction.haut);
+			}
 		}
 		position = positions(d); //on a les differentes directions (gauche, droite, etc) quon peut faire depuis nos nouvelles coordonnees
 		for(int i=0;i<position.size();i++) {
@@ -231,15 +238,13 @@ public class Agent {
 				heuristique=calculHeuristique(coordAgent);
 				fonctionEvaluation.add(coutNoeud);
 				fonctionEvaluation.add(heuristique);
-				for(int j=0;j<Cl.size();j++) {
-					if(coordAgent!=Cl.get(j)) { //test pour ne pas avoir un noeud deja utilise : si il ne l est pas ; on ajoute
-						b.add(coordAgent);
-						a.add(coordAgent);
-						a.add(fonctionEvaluation);
 
-						frontiere.add(a);
-					}
-				}
+				b.add(coordAgent);
+				a.add(coordAgent);
+				a.add(fonctionEvaluation);
+
+				frontiere.add(a);
+
 			}
 			if(position.get(i)==Direction.droite) {
 
@@ -254,15 +259,13 @@ public class Agent {
 				heuristique=calculHeuristique(coordAgent);
 				fonctionEvaluation.add(coutNoeud);
 				fonctionEvaluation.add(heuristique);
-				for(int j=0;j<Cl.size();j++) {
-					if(coordAgent!=Cl.get(j)) { //test pour ne pas avoir un noeud deja utilise : si il ne l est pas ; on ajoute
-						b.add(coordAgent);
-						a.add(coordAgent);
-						a.add(fonctionEvaluation);
 
-						frontiere.add(a);
-					}
-				}
+				b.add(coordAgent);
+				a.add(coordAgent);
+				a.add(fonctionEvaluation);
+
+				frontiere.add(a);
+
 			}
 			if(position.get(i)==Direction.haut) {
 
@@ -276,15 +279,14 @@ public class Agent {
 				heuristique=calculHeuristique(coordAgent);
 				fonctionEvaluation.add(coutNoeud);
 				fonctionEvaluation.add(heuristique);
-				for(int j=0;j<Cl.size();j++) {
-					if(coordAgent!=Cl.get(j)) { //test pour ne pas avoir un noeud deja utilise : si il ne l est pas ; on ajoute
-						b.add(coordAgent);
-						a.add(coordAgent);
-						a.add(fonctionEvaluation);
 
-						frontiere.add(a);
-					}
-				}
+				b.add(coordAgent);
+				a.add(coordAgent);
+				a.add(fonctionEvaluation);
+
+				frontiere.add(a);
+
+
 			}
 			if(position.get(i)==Direction.bas) {
 
@@ -299,15 +301,14 @@ public class Agent {
 				heuristique=calculHeuristique(coordAgent);
 				fonctionEvaluation.add(coutNoeud);
 				fonctionEvaluation.add(heuristique);
-				for(int j=0;j<Cl.size();j++) {
-					if(coordAgent!=Cl.get(j)) { //test pour ne pas avoir un noeud deja utilise : si il ne l est pas ; on ajoute
-						b.add(coordAgent);
-						a.add(coordAgent);
-						a.add(fonctionEvaluation);
 
-						frontiere.add(a);
-					}
-				}
+				b.add(coordAgent);
+				a.add(coordAgent);
+				a.add(fonctionEvaluation);
+
+				frontiere.add(a);
+
+
 			}
 		}
 		// on a la nouvelle frontiere ; on ajoute les nouveaux noeud de la frontiere dans la liste des newNoeud
@@ -317,26 +318,28 @@ public class Agent {
 		if(calculHeuristique(newCoord)==0) { // on est arrivé au point voulu 
 			return 1;
 		}
-		nbrNoeudExp++;
-		// verification de savoir si le noeud suivant est dans la continuite du noeud precedent ou si cest une nouvelle branche
-		testNoeud(newCoord, newNoeud, solutionCoord); // modifie la solution en fonction
-		return -1;
+		else {
+			nbrNoeudExp++;
+			// verification de savoir si le noeud suivant est dans la continuite du noeud precedent ou si cest une nouvelle branche
+			testNoeud(newCoord, newNoeud, solutionCoord); // modifie la solution en fonction
+			return -1;
+		}
 	}
 
 
 	private void testNoeud(List<Integer> newCoord,List <List<List<Integer>>> newNoeud, List <List<Integer>> solutionCoord) {
+		int testAjoutCoord=0;
 		for(int i=newNoeud.size()-1;i>=0;i--) {
 			for(int j=0;j<newNoeud.get(i).size();j++) {
 				if(newCoord==newNoeud.get(i).get(j)) {
 					solutionCoord.add(newCoord);
-					
-				}
-				else{
-					solutionCoord.remove(i); // on retire le dernier element de la solution
-				}
+					testAjoutCoord++;
+				}	
+			}
+			if(testAjoutCoord==0) {
+				solutionCoord.remove(i); // on retire le dernier element de la solution
 			}
 		}
-
 	}
 
 
@@ -364,24 +367,24 @@ public class Agent {
 		int heuristique=0;
 		int deplacementLigne;
 		int deplacementColonne;
-		coordPoussiere = new ArrayList<Integer>();
-		coordPoussiere = trouverPoussiere();
 		deplacementLigne = Math.abs(coordAgent.get(0)-coordPoussiere.get(0));
 		deplacementColonne = Math.abs(coordAgent.get(1)-coordPoussiere.get(1));
 		heuristique = deplacementColonne + deplacementLigne;
 		return heuristique;
 	}
 
-	private List<Integer> trouverPoussiere(){
+	private List<Integer> trouverPoussiere(){ //mise en place de boucle while
+
 		for(int i=0;i<4;i++) {
 			for(int j=0;j<4;j++) {
 				if (this.L[i][j] == State.dust || this.L[i][j] == State.jewelry || this.L[i][j] == State.dustjewelry ) {
 					coordPoussiere.add(i);
 					coordPoussiere.add(j);
+					return coordPoussiere;
 				}
 			}
 		}
-		return coordPoussiere;
+		return null; // pas de poussiere
 	}
 
 	/*
