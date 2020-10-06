@@ -386,7 +386,7 @@ public class Agent {
 
 	/*
 	 * MaFonction : positions
-	 * Attribut : a : une liste de direction que l'agent peut faire à partir de sa position actuelle Ex:a=[Droite, Haut, Haut]
+	 * Attribut : a : une liste de direction qui contient un chemin que l'agent peut faire à partir de sa position actuelle Ex:a=[Droite, Haut, Haut]
 	 * Rôle : l'agent suit le chemin indiquer dans a, et à partir de sa position finale il retourne une liste qui contient 
 	 * les directions qu'il peut choisir
 	 *  
