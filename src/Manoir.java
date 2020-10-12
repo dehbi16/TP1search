@@ -1,8 +1,11 @@
 
 
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
+
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -32,6 +35,20 @@ public class Manoir extends JFrame
 	      	   }
 	      	  
 	        }
+	        
+	        for(int i =0;i<5;i++) {
+		      	   for(int j = 0;j<5;j++) {
+		      		 if( j==2 || i == 2) {
+		      			mesChambres[i][j].setBorder(BorderFactory.createLineBorder(Color.green));
+		      		 }else {
+		      			mesChambres[i][j].setBorder(BorderFactory.createLineBorder(Color.red));
+		      		 }
+		      	   }
+		      	  
+		        }
+		        
+	        
+			
       
 	        this.repaint();
 	      
