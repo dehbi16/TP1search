@@ -11,6 +11,7 @@ public class Agent {
 	protected int nbbijoux = 0;
 	protected int cout = 0;
 	protected int erreur = 0;
+	protected int mode = 0;
 
 	protected static List <List<List<Integer>>> frontiere;
 	protected static List <List<Integer>> Cl;
@@ -45,51 +46,64 @@ public class Agent {
 	 * "solutions" pour chaque chemin, 
 	 */
 	protected void run() {
-		//int index = goal();
-		int index = -1;
-		if(index>=0 || indexBis>=0) {
-			/*
-			System.out.print("solution: ");
-			for(int i=0; i<solution.get(index).size(); i++) {
-				System.out.print(solution.get(index).get(i)+" ");
+		int index;
+		switch(mode) {
+		case 0:
+			index = goal();
+			if(index>=0) { 
+				move(index);
+				init();
+				if (isclean())	g.isRunning = false;
 			}
-			System.out.println();
-			 */
-			//move(index);
-			indexBis=-1;
-			System.out.println(solutionCoord);
-			moveAetoile(solutionCoord);
-			init();
-			if (isclean()) {
-				g.isRunning = false;
+			else {
+				List <Direction> a;
+				List <Direction> position;
+				int size = solution.size();
+
+				for (int i=0; i<size; i++) {
+					a = solution.get(0);
+					solution.remove(0);
+					position = positions(a);
+					for (int j=0; j<position.size(); j++) {
+						List <Direction> b = new ArrayList<Direction>();
+						b.addAll(a);
+						b.add(position.get(j));
+						solution.add(b);
+					}
+				}
+
 			}
+			break;
+		case 1:
+			index = -1;
+			if(index>=0 || indexBis>=0) {
+				/*
+				System.out.print("solution: ");
+				for(int i=0; i<solution.get(index).size(); i++) {
+					System.out.print(solution.get(index).get(i)+" ");
+				}
+				System.out.println();
+				 */
+				//move(index);
+				indexBis=-1;
+				System.out.println(solutionCoord);
+				moveAetoile(solutionCoord);
+				init();
+				if (isclean()) {
+					g.isRunning = false;
+				}
+			}
+			else {
+				//on commence par savoir où il y a de la poussiere
+				coordPoussiere = new ArrayList<Integer>();
+				coordPoussiere = trouverPoussiere();
+				System.out.println("coordonnées poussière : " + coordPoussiere);
+				solution();
+			}
+			break;
+
 		}
 
-//		else { 
-//			List <Direction> a; 
-//			List <Direction> position; 
-//			int size = solution.size();
-//
-//			for (int i=0; i<size; i++) { 
-//				a = solution.get(0); // a contient le premier chemin de la liste "solution" 
-//				solution.remove(0); // supprimer le premier chemin 
-//				position = positions(a); // position contient les nouveaux noeuds du chemin a 
-//				for (int j=0; j<position.size(); j++) { // pour chaque noeud on crée un nouveau chemin et on l'ajoute dans la fin de "solution" 
-//					List <Direction> b = new ArrayList<Direction>(); 
-//					b.addAll(a);
-//					b.add(position.get(j));
-//					solution.add(b); 
-//				}
-//			}
-//		}
-
-		else {
-			//on commence par savoir où il y a de la poussiere
-			coordPoussiere = new ArrayList<Integer>();
-			coordPoussiere = trouverPoussiere();
-			System.out.println("coordonnées poussière : " + coordPoussiere);
-			solution();
-		}
 	}
 
 	private void solution() {
@@ -101,19 +115,19 @@ public class Agent {
 		coordAgent.add(ligneInitialeAgent);
 		coordAgent.add(colonneInitialeAgent);
 		System.out.println("coordAgent : " + coordAgent);
-		
+
 		Cl.add(coordAgent);
 		System.out.println("Cl : " + Cl);
-		
+
 		solutionCoord.add(coordAgent);
 		System.out.println("solutionCoord : " + solutionCoord);
 
 		frontiere = new ArrayList<List<List<Integer>>>();
 		System.out.println("frontiere : " + frontiere);
-		
+
 		newNoeud = new ArrayList<List<List<Integer>>>();
 		System.out.println("newNoeud : " + newNoeud);
-		
+
 		b = new ArrayList<List<Integer>>(); //permet de créer la liste newNoeud ;
 		for(int i=0;i<solution.size();i++) { //initialisation et expansion du noeud de depart a partir de l init ; on a une frontiere avec plusieurs nouveaux noeuds 
 			for(int j=0;j<solution.get(i).size();j++) {
@@ -232,9 +246,9 @@ public class Agent {
 	}
 
 	private int expansionNoeud(List <List<List<Integer>>> frontiere,List <List<List<Integer>>> newNoeud, List <List<Integer>> Cl, int nbNoeudExp ) {
-	Cl.add(newCoord); // on ajoute a la closed list les nouvelles coord
+		Cl.add(newCoord); // on ajoute a la closed list les nouvelles coord
 		System.out.println("Cl : " + Cl);
-		
+
 		List<Direction> d;
 		List<Direction> position;
 		d = new ArrayList<Direction>();
@@ -455,22 +469,40 @@ public class Agent {
 		// créer des nouveaux noeuds pour chaque état
 		int newl = this.y;
 		int newc = this.x;
-		int [] resultat;
+		int [] resultat = new int[2];
+		resultat[0] = newl;
+		resultat[1] = newc;
 		List<Direction> directionPossible = new ArrayList<Direction>();
+		List<int[]> visited = new ArrayList<int[]>();
+		visited.add(resultat);
 		int i;
 		for (i=0; i<a.size(); i++) {
 			resultat = calculeP(a.get(i),newl, newc);
 			newl = resultat[0];
 			newc = resultat[1];
+			visited.add(resultat);
 		}
 		i--;
-		if (newl!=0 && a.get(i) != Direction.bas) directionPossible.add(Direction.haut);
-		if (newl!=4 && a.get(i) != Direction.haut) directionPossible.add(Direction.bas);
-		if (newc!=0 && a.get(i) != Direction.droite) directionPossible.add(Direction.gauche);
-		if (newc!=4 && a.get(i) != Direction.gauche) directionPossible.add(Direction.droite);
+		if (newl!=0 && !contains(visited, newc, newl-1)) { // && !contains(visited, col, lig) col=newc, lig=newl-1
+			directionPossible.add(Direction.haut);
+		} 
+		if (newl!=4 && !contains(visited, newc, newl+1)) directionPossible.add(Direction.bas);
+		if (newc!=0 && !contains(visited, newc-1, newl)) directionPossible.add(Direction.gauche);
+		if (newc!=4 && !contains(visited, newc+1, newl)) directionPossible.add(Direction.droite);
 
 
 		return directionPossible;
+	}
+
+	private boolean contains(List<int[]> visited, int col, int lig) {
+		for(int i=0; i<visited.size(); i++) {
+			if (visited.get(i)[0]== lig && visited.get(i)[1]==col) {
+				return true;
+			}
+		}
+
+
+		return false;
 	}
 
 	/*
@@ -528,29 +560,33 @@ public class Agent {
 		int newc = this.x;
 		int [] resultat;
 		for (int i=0; i<solution.get(index).size(); i++) {
+			g.env.L[newl][newc] = State.empty;
 			resultat = calculeP(solution.get(index).get(i), newl, newc);
 			newl = resultat[0];
 			newc = resultat[1];
 			cout++;
+			if (this.L[newl][newc] == State.dust) {
+				nbaspirer++;
+				cout++;
+				if (g.env.L[newl][newc] == State.jewelry || g.env.L[newl][newc] == State.dustjewelry) erreur++;
+				g.env.L[newl][newc] = State.empty;
+			}
+			else if (this.L[newl][newc] == State.jewelry) {
+				nbbijoux++;
+				cout++;
+				g.env.L[newl][newc] = State.empty;
+			}
+			else if (this.L[newl][newc] == State.dustjewelry) {
+				nbbijoux++;
+				nbaspirer++;
+				cout+=2;
+				g.env.L[newl][newc] = State.empty; 
+			}
+			g.env.L[newl][newc] = State.robot;
+			
 		}
 		this.y = newl;
 		this.x = newc;
-		if (this.L[this.y][this.x] == State.dust) {
-			nbaspirer++;
-			cout++;
-			if (g.env.L[this.y][this.x] != State.dust) erreur++;
-			g.env.L[this.y][this.x] = State.robot;
-		}
-		else if (this.L[this.y][this.x] == State.jewelry) {
-			nbbijoux++;
-			cout++;
-		}
-		else if (this.L[this.y][this.x] == State.dustjewelry) {
-			nbbijoux++;
-			nbaspirer++;
-			cout+=2;
-		}
-		g.env.L[this.y][this.x] = State.robot;
 	}
 
 	private void moveAetoile(List <List<Integer>> solutionCoord) {
@@ -600,7 +636,12 @@ public class Agent {
 	 * 			certaines directions sont interdites Ex: si l'agent se retrouve dans les frontières 
 	 */
 	private void init(){
-		this.L = g.env.L;
+		this.L = new State[5][5];
+		for(int i=0; i<5; i++) {
+			for(int j=0; j<5; j++) {
+				this.L[i][j] = g.env.L[i][j];
+			}
+		}
 
 		solution = new ArrayList<List<Direction>>();
 		List <Direction> a;
