@@ -2,11 +2,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 //Test
-public class Agent {
+public class Agent implements Runnable {
 	protected int x;
 	protected int y;
 	protected Game g;
 	private State[][] L; 
+	protected Thread t;
 	protected static List <List<Direction>> solution; // "solution" est une file de type FIFO
 	protected static List<Integer> Lheuristique;
 	protected int h;
@@ -37,7 +38,9 @@ public class Agent {
 		this.x = x;
 		this.y = y;
 		this.g = g;
-		init();		
+		t = new Thread(this);
+		init();	
+		t.start();
 	}
 
 	/*
@@ -48,85 +51,91 @@ public class Agent {
 	 * Sinon, on parcours toute les éléments de la liste "solution" et on ajoute des nouveaux noeuds dans la liste 
 	 * "solutions" pour chaque chemin, 
 	 */
-	protected void run() {
-		int index;
-		switch(mode) {
-		case 0: // on effectue l'algorithme de recherche en largeur
-			index = goal();
-			if(index>=0) { // déplacement du robot après avoir trouvé le chemin qui mène jusqu'à la poussière ou un bijou
-				move(index);
-				init();
-				if (isclean())	g.isRunning = false;
+	public void run() {
+		while(g.isRunning) {
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			else { // on construit le chemin qui mène jusqu'à une poussière ou un bijou
-				List <Direction> a;
-				List <Direction> position;
-				int size = solution.size();
-
-				for (int i=0; i<size; i++) {
-					a = solution.get(0);
-					solution.remove(0);
-					position = positions(a);
-					for (int j=0; j<position.size(); j++) {
-						List <Direction> b = new ArrayList<Direction>();
-						b.addAll(a);
-						b.add(position.get(j));
-						solution.add(b);
-					}
+			int index;
+			switch(mode) {
+			case 0: // on effectue l'algorithme de recherche en largeur
+				index = goal();
+				if(index>=0) { // déplacement du robot après avoir trouvé le chemin qui mène jusqu'à la poussière ou un bijou
+					move(index);
+					init();
+					if (isclean())	g.isRunning = false;
 				}
+				else { // on construit le chemin qui mène jusqu'à une poussière ou un bijou
+					List <Direction> a;
+					List <Direction> position;
+					int size = solution.size();
 
-			}
-			break;
-		case 1: // on effectue l'algorithme de recherche A*
-			if(indexBis>=0) { // déplacement du robot après avoir trouvé le chemin qui mène jusqu'à la poussière ou un bijou
-				indexBis=-1;
-				System.out.println(solutionCoord);
-				moveAetoile();
-				init();
-				if (isclean()) {
-					g.isRunning = false;
-				}
-			}
-			else { // on construit le chemin qui mène jusqu'à une poussière ou un bijou
-				coordPoussiere = new ArrayList<List<Integer>>();
-				trouverPoussiere(); // on commence par savoir où il y a de la poussiere
-				System.out.println("coordonnées poussière : " + coordPoussiere);
-				solution(); // on rentre dans l'algorithme
-			}
-			break;
-		case 2:
-			index = goal1();
-			if (index>= 0) {
-				move(index); 
-				init();
-				if (isclean()) g.isRunning=false;
-			}
-			else {
-				List <Direction> a;
-				List <Direction> position;
-				int size = solution.size();
-				int x;
-				for (int i=0; i<size; i++) {
-					a = solution.get(0);
-					solution.remove(0);
-					Lheuristique.remove(0); 
-					position = positions(a);
-					for (int j=0; j<position.size(); j++) {
-						List <Direction> b = new ArrayList<Direction>();
-						b.addAll(a);
-						b.add(position.get(j));
-						x = calculH(b);
-						if (x>=h) {
+					for (int i=0; i<size; i++) {
+						a = solution.get(0);
+						solution.remove(0);
+						position = positions(a);
+						for (int j=0; j<position.size(); j++) {
+							List <Direction> b = new ArrayList<Direction>();
+							b.addAll(a);
+							b.add(position.get(j));
 							solution.add(b);
-							Lheuristique.add(x);
-							h = x;
-						}	
+						}
+					}
+
+				}
+				break;
+			case 1: // on effectue l'algorithme de recherche A*
+				if(indexBis>=0) { // déplacement du robot après avoir trouvé le chemin qui mène jusqu'à la poussière ou un bijou
+					indexBis=-1;
+					System.out.println(solutionCoord);
+					moveAetoile();
+					init();
+					if (isclean()) {
+						g.isRunning = false;
 					}
 				}
+				else { // on construit le chemin qui mène jusqu'à une poussière ou un bijou
+					coordPoussiere = new ArrayList<List<Integer>>();
+					trouverPoussiere(); // on commence par savoir où il y a de la poussiere
+					System.out.println("coordonnées poussière : " + coordPoussiere);
+					solution(); // on rentre dans l'algorithme
+				}
+				break;
+			case 2:
+				index = goal1();
+				if (index>= 0) {
+					move(index); 
+					init();
+					if (isclean()) g.isRunning=false;
+				}
+				else {
+					List <Direction> a;
+					List <Direction> position;
+					int size = solution.size();
+					int x;
+					for (int i=0; i<size; i++) {
+						a = solution.get(0);
+						solution.remove(0);
+						Lheuristique.remove(0); 
+						position = positions(a);
+						for (int j=0; j<position.size(); j++) {
+							List <Direction> b = new ArrayList<Direction>();
+							b.addAll(a);
+							b.add(position.get(j));
+							x = calculH(b);
+							if (x>=h) {
+								solution.add(b);
+								Lheuristique.add(x);
+								h = x;
+							}	
+						}
+					}
+				}
+				break; 
 			}
-			break; 
 		}
-
 	}
 
 	/*
@@ -659,7 +668,7 @@ public class Agent {
 
 		return false;
 	}
-	
+
 	/*
 	 * MaFonction : positions
 	 * Attribut : a : une liste de direction que l'agent peut faire à partir de sa position actuelle Ex:a=[Droite, Haut, Haut]
@@ -792,7 +801,7 @@ public class Agent {
 		return hbis;
 	}
 
-	
+
 	private int goal1() {
 		for(int i=0; i<Lheuristique.size(); i++) {
 			if(Lheuristique.get(i) == hmax || Lheuristique.get(i) == 5) {
@@ -801,7 +810,7 @@ public class Agent {
 		}
 		return -1;
 	}
-	
+
 	/*
 	 * MaFonction : move
 	 * attribut : l'indice du chemin dans "solution" que le robot doit suivre pour réaliser son but
@@ -837,6 +846,12 @@ public class Agent {
 				g.env.L[newl][newc] = State.empty; 
 			}
 			g.env.L[newl][newc] = State.robot;
+			try {
+				TimeUnit.MILLISECONDS.sleep(300);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
 		this.y = newl;
 		this.x = newc;
@@ -899,7 +914,7 @@ public class Agent {
 				this.L[i][j] = g.env.L[i][j];
 			}
 		}
-		
+
 		if (mode==2) {
 			hmax = 0;
 			for(int i=0; i<5; i++) {
@@ -911,7 +926,7 @@ public class Agent {
 			}
 		}
 
-		
+
 		solution = new ArrayList<List<Direction>>();
 		if (mode==2) Lheuristique = new ArrayList<Integer>();
 		h=0;

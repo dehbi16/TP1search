@@ -4,23 +4,14 @@ public class Game {
 	protected boolean isRunning = false;
 	protected Agent agent;
 	protected Environnement env;
-	public Manoir manoir;
+	protected Manoir manoir;
 	public Game() throws InterruptedException {
-		init();	
+			
 		isRunning = true;
+		init();
 		while(isRunning) {
 			TimeUnit.MILLISECONDS.sleep(300);
 			afficher();
-			/*
-			System.out.println("nombre aspirer = "+agent.nbaspirer);
-			System.out.println("nombre bijoux = "+agent.nbbijoux);
-			System.out.println("nombre de coût = "+agent.cout);
-			System.out.println("nombre d'erreur = "+agent.erreur);
-			System.out.println();
-			 */
-
-			env.run();
-			agent.run();
 		}
 	}
 
@@ -31,8 +22,8 @@ public class Game {
 	 * 		  3) Ajouter le robot dans l'environnement
 	 */
 	public void init() {
-		manoir= new Manoir();
-		env = new Environnement();
+		manoir = new Manoir();
+		env = new Environnement(isRunning);
 		int a;
 		int b;
 		for (int i=0; i<7; i++) {
@@ -46,7 +37,7 @@ public class Game {
 
 		env.L[a][b] = State.robot;
 		agent = new Agent(b, a, this);
-		manoir.placementD_J_DJ_R(a, b, "4");
+		//manoir.placementD_J_DJ_R(a, b, "4");
 
 
 	}
