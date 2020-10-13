@@ -76,14 +76,6 @@ public class Agent {
 		case 1:
 			index = -1;
 			if(index>=0 || indexBis>=0) {
-				/*
-				System.out.print("solution: ");
-				for(int i=0; i<solution.get(index).size(); i++) {
-					System.out.print(solution.get(index).get(i)+" ");
-				}
-				System.out.println();
-				 */
-				//move(index);
 				indexBis=-1;
 				System.out.println(solutionCoord);
 				moveAetoile();
