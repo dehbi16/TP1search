@@ -14,7 +14,7 @@ public class Environnement {
 			}
 		}
 	}
-	
+
 	/*
 	 * MaFonction : run
 	 * Role : ajouter de la poussière et des bijoux dans l'environnement en suivant des probabilités  
@@ -34,5 +34,5 @@ public class Environnement {
 			else if (L[a][b]==State.dust) L[a][b] = State.dustjewelry;
 		}
 	}
-	
+
 }

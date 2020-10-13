@@ -1,6 +1,3 @@
-
-
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -12,7 +9,7 @@ import javax.swing.JFrame;
 
 public class Manoir extends JFrame 
 { 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
@@ -21,42 +18,42 @@ public class Manoir extends JFrame
 	private ImageIcon DUST = new ImageIcon(getClass().getResource("images/dust.png"));
 	private ImageIcon ROBOT = new ImageIcon(getClass().getResource("images/robot2.png"));
 	private ImageIcon DUSTJEWERLY = new ImageIcon(getClass().getResource("images/dujew.png"));
-	
-	
+
+
 	public Manoir ()     { 
-	        setTitle("Manoir"); 
-	        setSize(600, 600);   
-	        setLayout(new GridLayout(5,5)); 
-	        Container c = getContentPane();             
-	        for(int i =0;i<5;i++) {
-	      	   for(int j = 0;j<5;j++) {
-	      		 mesChambres[i][j]= new JButton();
-	      		 c.add(mesChambres[i][j]);
-	      	   }
-	      	  
-	        }
-	        
-	        for(int i =0;i<5;i++) {
-		      	   for(int j = 0;j<5;j++) {
-		      		 if( j==2 || i == 2) {
-		      			mesChambres[i][j].setBorder(BorderFactory.createLineBorder(Color.green));
-		      		 }else {
-		      			mesChambres[i][j].setBorder(BorderFactory.createLineBorder(Color.red));
-		      		 }
-		      	   }
-		      	  
-		        }
-		        
-	        
-			
-      
-	        this.repaint();
-	      
-	        setLocationRelativeTo(null);
-	        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-	        this.setVisible(true);
-    } 
-	
+		setTitle("Manoir"); 
+		setSize(600, 600);   
+		setLayout(new GridLayout(5,5)); 
+		Container c = getContentPane();             
+		for(int i =0;i<5;i++) {
+			for(int j = 0;j<5;j++) {
+				mesChambres[i][j]= new JButton();
+				c.add(mesChambres[i][j]);
+			}
+
+		}
+
+		for(int i =0;i<5;i++) {
+			for(int j = 0;j<5;j++) {
+				if( j==2 || i == 2) {
+					mesChambres[i][j].setBorder(BorderFactory.createLineBorder(Color.green));
+				}else {
+					mesChambres[i][j].setBorder(BorderFactory.createLineBorder(Color.red));
+				}
+			}
+
+		}
+
+
+
+
+		this.repaint();
+
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		this.setVisible(true);
+	} 
+
 	/*
 	 * NomFonction : placementD_J_DJ_R
 	 * Attribut:
@@ -69,12 +66,12 @@ public class Manoir extends JFrame
 		try {
 			mesChambres[indice_i][indice_j].setIcon(retourneImage(typeD_J_DJ_R));
 		}catch(Exception ex) {
-			
+
 		}
 		this.repaint();				
 	}
-	
-	
+
+
 	public ImageIcon retourneImage(String typeD_J_DJ_R) {
 		ImageIcon img = new ImageIcon();
 		/*
@@ -93,13 +90,13 @@ public class Manoir extends JFrame
 			img=ROBOT;
 		return img;
 	}
-	
+
 	public void miseAjourSurLeManoirInfoAgent(String nbAspiration,String nbBijouxAspires,String cout,String erreur) {
 		setTitle("MANOIR"+" | AGENT { Aspiration : "+nbAspiration +" Bijoux : "+nbBijouxAspires 
 				+" Cout: "+cout +" Erreur : "+erreur+ " }"); 
 	}
-      
-  
+
+
 } 
 
 

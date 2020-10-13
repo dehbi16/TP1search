@@ -17,13 +17,13 @@ public class Game {
 			System.out.println("nombre de coût = "+agent.cout);
 			System.out.println("nombre d'erreur = "+agent.erreur);
 			System.out.println();
-			*/
-			
+			 */
+
 			env.run();
 			agent.run();
 		}
 	}
-	
+
 	/*
 	 * MaFonction : init 
 	 * Role : 1) Instancier les classes Manoir, Environnement et Agent
@@ -40,17 +40,17 @@ public class Game {
 			b = (int)(Math.random()*5+1) - 1;
 			env.L[a][b] = State.dust;
 		}
-		
+
 		a = (int)(Math.random()*5+1) - 1;
 		b = (int)(Math.random()*5+1) - 1;
-		
+
 		env.L[a][b] = State.robot;
 		agent = new Agent(b, a, this);
 		manoir.placementD_J_DJ_R(a, b, "4");
-		
-		
+
+
 	}
-	
+
 	private void afficher() {
 		for(int i=0; i<5; i++) {
 			for (int j=0; j<5; j++) {
@@ -64,25 +64,25 @@ public class Game {
 			//System.out.println();
 		}
 	}
-	
+
 	public String etatCase(String text) {
 		String monEtat="";
-		
-		
-		
+
+
+
 		return monEtat;
 	}
-	
-	
+
+
 }
 
 
 
 
 
- 
- 
- 
+
+
+
 
 
 
