@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 //Test
 public class Agent {
 	protected int x;
@@ -7,11 +8,14 @@ public class Agent {
 	protected Game g;
 	private State[][] L; 
 	protected static List <List<Direction>> solution; // "solution" est une file de type FIFO
+	protected static List<Integer> Lheuristique;
+	protected int h;
+	protected int hmax;
 	protected int nbaspirer = 0;
 	protected int nbbijoux = 0;
 	protected int cout = 0;
 	protected int erreur = 0;
-	protected int mode = 0;
+	protected int mode = 2;
 
 	protected static List <List<List<Integer>>> frontiere;
 	protected static List <List<Integer>> Cl;
@@ -90,7 +94,37 @@ public class Agent {
 				solution(); // on rentre dans l'algorithme
 			}
 			break;
-
+		case 2:
+			index = goal1();
+			if (index>= 0) {
+				move(index); 
+				init();
+				if (isclean()) g.isRunning=false;
+			}
+			else {
+				List <Direction> a;
+				List <Direction> position;
+				int size = solution.size();
+				int x;
+				for (int i=0; i<size; i++) {
+					a = solution.get(0);
+					solution.remove(0);
+					Lheuristique.remove(0); 
+					position = positions(a);
+					for (int j=0; j<position.size(); j++) {
+						List <Direction> b = new ArrayList<Direction>();
+						b.addAll(a);
+						b.add(position.get(j));
+						x = calculH(b);
+						if (x>=h) {
+							solution.add(b);
+							Lheuristique.add(x);
+							h = x;
+						}	
+					}
+				}
+			}
+			break; 
 		}
 
 	}
@@ -615,6 +649,17 @@ public class Agent {
 		}
 	}
 
+	private boolean contains(List<int[]> visited, int col, int lig) {
+		for(int i=0; i<visited.size(); i++) {
+			if (visited.get(i)[0]== lig && visited.get(i)[1]==col) {
+				return true;
+			}
+		}
+
+
+		return false;
+	}
+	
 	/*
 	 * MaFonction : positions
 	 * Attribut : a : une liste de direction que l'agent peut faire à partir de sa position actuelle Ex:a=[Droite, Haut, Haut]
@@ -627,21 +672,26 @@ public class Agent {
 		int newl = this.y; 
 		int newc = this.x; 
 		// partie algo inf
-		switch(mode) {
+		switch((mode%2)) {
 		case 0:
-			int [] resultat;
+			int [] resultat = new int [2];
+			resultat[0] = newl;
+			resultat[1] = newc;
 			List<Direction> directionPossible = new ArrayList<Direction>();
+			List<int[]> visited = new ArrayList<int[]>();
+			visited.add(resultat);
 			int i;
 			for (i=0; i<a.size(); i++) {
 				resultat = calculeP(a.get(i),newl, newc);
 				newl = resultat[0];
 				newc = resultat[1];
+				visited.add(resultat);
 			}
 			i--;
-			if (newc!=0 && a.get(i) != Direction.droite) directionPossible.add(Direction.gauche);
-			if (newc!=4 && a.get(i) != Direction.gauche) directionPossible.add(Direction.droite);
-			if (newl!=0 && a.get(i) != Direction.bas) directionPossible.add(Direction.haut);
-			if (newl!=4 && a.get(i) != Direction.haut) directionPossible.add(Direction.bas);
+			if (newl!=0 && !contains(visited, newc, newl-1)) directionPossible.add(Direction.haut);
+			if (newl!=4 && !contains(visited, newc, newl+1)) directionPossible.add(Direction.bas);
+			if (newc!=0 && !contains(visited, newc-1, newl)) directionPossible.add(Direction.gauche);
+			if (newc!=4 && !contains(visited, newc+1, newl)) directionPossible.add(Direction.droite);
 
 
 			return directionPossible;
@@ -649,7 +699,7 @@ public class Agent {
 		case 1:
 			if(a.get(0)==Direction.gauche) {
 				newl = newCoord.get(0);
-				newc = newCoord.get(1)+1;
+				newc = newCoord.get(1)+1; 
 			}
 			else if(a.get(0)==Direction.droite) {
 				newl = newCoord.get(0);
@@ -726,6 +776,32 @@ public class Agent {
 		return -1;
 	}
 
+	private int calculH(List<Direction> b) {
+		int hbis=0;
+		int positionx = this.x;
+		int positiony = this.y;
+		int [] resultat;
+		for(int i=0; i<b.size(); i++) {
+			resultat = calculeP(b.get(i), positiony, positionx);
+			positiony = resultat[0];
+			positionx = resultat[1];
+			if (this.L[positiony][positionx] == State.dust || this.L[positiony][positionx] == State.dustjewelry || this.L[positiony][positionx] == State.jewelry ) {
+				hbis++;
+			}
+		}
+		return hbis;
+	}
+
+	
+	private int goal1() {
+		for(int i=0; i<Lheuristique.size(); i++) {
+			if(Lheuristique.get(i) == hmax || Lheuristique.get(i) == 5) {
+				return i;  
+			}
+		}
+		return -1;
+	}
+	
 	/*
 	 * MaFonction : move
 	 * attribut : l'indice du chemin dans "solution" que le robot doit suivre pour réaliser son but
@@ -738,29 +814,32 @@ public class Agent {
 		int newc = this.x;
 		int [] resultat;
 		for (int i=0; i<solution.get(index).size(); i++) {
+			g.env.L[newl][newc] = State.empty;
 			resultat = calculeP(solution.get(index).get(i), newl, newc);
 			newl = resultat[0];
 			newc = resultat[1];
 			cout++;
+			if (this.L[newl][newc] == State.dust) {
+				nbaspirer++;
+				cout++;
+				if (g.env.L[newl][newc] == State.jewelry || g.env.L[newl][newc] == State.dustjewelry) erreur++;
+				g.env.L[newl][newc] = State.empty;
+			}
+			else if (this.L[newl][newc] == State.jewelry) {
+				nbbijoux++;
+				cout++;
+				g.env.L[newl][newc] = State.empty;
+			}
+			else if (this.L[newl][newc] == State.dustjewelry) {
+				nbbijoux++;
+				nbaspirer++;
+				cout+=2;
+				g.env.L[newl][newc] = State.empty; 
+			}
+			g.env.L[newl][newc] = State.robot;
 		}
 		this.y = newl;
 		this.x = newc;
-		if (this.L[this.y][this.x] == State.dust) {
-			nbaspirer++;
-			cout++;
-			if (g.env.L[this.y][this.x] != State.dust) erreur++;
-			g.env.L[this.y][this.x] = State.robot;
-		}
-		else if (this.L[this.y][this.x] == State.jewelry) {
-			nbbijoux++;
-			cout++;
-		}
-		else if (this.L[this.y][this.x] == State.dustjewelry) {
-			nbbijoux++;
-			nbaspirer++;
-			cout+=2;
-		}
-		g.env.L[this.y][this.x] = State.robot;
 	}
 
 	/*
@@ -814,29 +893,53 @@ public class Agent {
 	 * 			certaines directions sont interdites Ex: si l'agent se retrouve dans les frontières 
 	 */
 	private void init(){
-		this.L = g.env.L;
+		this.L = new State[5][5];
+		for(int i=0; i<5; i++) {
+			for(int j=0; j<5; j++) {
+				this.L[i][j] = g.env.L[i][j];
+			}
+		}
+		
+		if (mode==2) {
+			hmax = 0;
+			for(int i=0; i<5; i++) {
+				for(int j=0; j<5; j++) {
+					if (this.L[i][j] == State.dust || this.L[i][j] == State.jewelry || this.L[i][j] == State.dustjewelry) {
+						hmax++;
+					}
+				}
+			}
+		}
 
+		
 		solution = new ArrayList<List<Direction>>();
+		if (mode==2) Lheuristique = new ArrayList<Integer>();
+		h=0;
+
 		List <Direction> a;
 		if (this.x != 0) {
 			a = new ArrayList<Direction>();
 			a.add(Direction.gauche);
 			solution.add(a);
+			if (mode==2) Lheuristique.add(0);
 		}
 		if (this.x != 4) {
 			a = new ArrayList<Direction>();
 			a.add(Direction.droite);
 			solution.add(a);
+			if (mode==2) Lheuristique.add(0);
 		}
 		if (this.y != 0) {
 			a = new ArrayList<Direction>();
 			a.add(Direction.haut);
 			solution.add(a);
+			if (mode==2) Lheuristique.add(0);
 		}
 		if (this.y != 4) {
 			a = new ArrayList<Direction>();
 			a.add(Direction.bas);
 			solution.add(a);
+			if (mode==2) Lheuristique.add(0);
 		}
 
 	}
