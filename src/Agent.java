@@ -23,7 +23,7 @@ public class Agent {
 	protected static List <List<Integer>> solutionCoord;
 	protected static List <List<List<Integer>>> newNoeud;
 	protected static List <List<Integer>> noeudExp;
-	protected static List <Integer> coordPoussiere;
+	protected static List <List<Integer>> coordPoussiere;
 
 	protected int coutNoeud;
 	protected int heuristique;
@@ -94,8 +94,8 @@ public class Agent {
 			}
 			else {
 				//on commence par savoir où il y a de la poussiere
-				coordPoussiere = new ArrayList<Integer>();
-				coordPoussiere = trouverPoussiere();
+				coordPoussiere = new ArrayList<List<Integer>>();
+				trouverPoussiere();
 				System.out.println("coordonnées poussière : " + coordPoussiere);
 				solution();
 			}
@@ -485,12 +485,17 @@ public class Agent {
 	}
 
 	private int calculHeuristique(List <Integer> noeud) {
-		int heuristique=0;
-		int deplacementLigne;
-		int deplacementColonne;
-		deplacementLigne = Math.abs(noeud.get(0)-coordPoussiere.get(0));
-		deplacementColonne = Math.abs(noeud.get(1)-coordPoussiere.get(1));
-		heuristique = deplacementColonne + deplacementLigne;
+		int heuristique = 100;
+		int heuristiqueInter = 0;
+		int deplacementLigne = 100;
+		int deplacementColonne = 100;
+		for(int i=0;i<coordPoussiere.size();i++) {
+			deplacementLigne = Math.abs(noeud.get(0)-coordPoussiere.get(i).get(0));
+			deplacementColonne = Math.abs(noeud.get(1)-coordPoussiere.get(i).get(1));
+			heuristiqueInter = deplacementColonne + deplacementLigne;
+			if(heuristiqueInter < heuristique) {
+				heuristique = heuristiqueInter;			}
+		}
 		return heuristique;
 	}
 
@@ -503,18 +508,19 @@ public class Agent {
 		coutNoeud = deplacementColonne + deplacementLigne;
 		return coutNoeud;
 	}
-	private List<Integer> trouverPoussiere(){ //mise en place de boucle while
-
+	private void trouverPoussiere(){ //mise en place de boucle while
+		List<Integer> remplissagePoussiere;
+		
 		for(int i=0;i<5;i++) {
 			for(int j=0;j<5;j++) {
 				if (this.L[i][j] == State.dust || this.L[i][j] == State.jewelry || this.L[i][j] == State.dustjewelry ) {
-					coordPoussiere.add(i);
-					coordPoussiere.add(j);
-					return coordPoussiere;
+					remplissagePoussiere = new ArrayList<Integer>();
+					remplissagePoussiere.add(i);
+					remplissagePoussiere.add(j);
+					coordPoussiere.add(remplissagePoussiere);
 				}
 			}
 		}
-		return null; // pas de poussiere
 	}
 
 	/*
@@ -569,16 +575,16 @@ public class Agent {
 			int [] resultatBis;
 			List<Direction> directionPossibleBis = new ArrayList<Direction>();
 			int iBis;
-			for (i=0; i<a.size(); i++) {
-				resultatBis = calculeP(a.get(i),newl, newc);
+			for (iBis=0; iBis<a.size(); iBis++) {
+				resultatBis = calculeP(a.get(iBis),newl, newc);
 				newl = resultatBis[0];
 				newc = resultatBis[1];
 			}
-			i--;
-			if (newc!=0 && a.get(i) != Direction.droite) directionPossibleBis.add(Direction.gauche);
-			if (newc!=4 && a.get(i) != Direction.gauche) directionPossibleBis.add(Direction.droite);
-			if (newl!=0 && a.get(i) != Direction.bas) directionPossibleBis.add(Direction.haut);
-			if (newl!=4 && a.get(i) != Direction.haut) directionPossibleBis.add(Direction.bas);
+			iBis--;
+			if (newc!=0 && a.get(iBis) != Direction.droite) directionPossibleBis.add(Direction.gauche);
+			if (newc!=4 && a.get(iBis) != Direction.gauche) directionPossibleBis.add(Direction.droite);
+			if (newl!=0 && a.get(iBis) != Direction.bas) directionPossibleBis.add(Direction.haut);
+			if (newl!=4 && a.get(iBis) != Direction.haut) directionPossibleBis.add(Direction.bas);
 			return directionPossibleBis;
 			
 		}
